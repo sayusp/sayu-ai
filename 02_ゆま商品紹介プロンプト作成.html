@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>楽天ROOM・Threads 商品紹介プロンプト作成</title>
+<style>
+:root{
+  --bg:#f6f7fb;
+  --card:#fff;
+  --text:#222;
+  --muted:#6b7280;
+  --border:#dfe3ea;
+  --accent:#6c63ff;
+  --accent2:#4f46e5;
+  --ok:#0f766e;
+  --warn-bg:#fff8e7;
+  --warn-border:#f5d787;
+  --warn-text:#6b4f00
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6
+}
+.wrap{
+  max-width:900px;
+  margin:0 auto;
+  padding:24px 16px 48px
+}
+header{margin-bottom:18px}
+h1{
+  font-size:1.65rem;
+  margin:0 0 6px
+}
+.sub{
+  color:var(--muted);
+  font-size:.95rem
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin-top:14px;
+  box-shadow:0 5px 18px rgba(0,0,0,.04)
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+.full{grid-column:1/-1}
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:6px
+}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fff;
+  color:var(--text);
+  font:inherit
+}
+textarea{
+  min-height:110px;
+  resize:vertical
+}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid rgba(108,99,255,.18);
+  border-color:var(--accent)
+}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px
+}
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 16px;
+  font-weight:700;
+  font:inherit;
+  cursor:pointer
+}
+.primary{
+  background:var(--accent);
+  color:white
+}
+.primary:hover{background:var(--accent2)}
+.secondary{
+  background:#eef0ff;
+  color:#3730a3
+}
+.ghost{
+  background:#eef2f7;
+  color:#374151
+}
+.status{
+  margin-top:10px;
+  color:var(--ok);
+  font-weight:700;
+  min-height:1.6em
+}
+.output{
+  min-height:360px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  white-space:pre-wrap
+}
+.note{
+  background:var(--warn-bg);
+  border:1px solid var(--warn-border);
+  border-radius:12px;
+  padding:12px 14px;
+  font-size:.92rem;
+  color:var(--warn-text);
+  margin-top:12px
+}
+small{color:var(--muted)}
+.hidden{display:none}
+.section-label{
+  font-size:.86rem;
+  color:var(--muted);
+  margin-top:4px
+}
+@media(max-width:680px){
+  .grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .wrap{padding:16px 12px 40px}
+  h1{font-size:1.35rem}
+  button{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>楽天ROOM・Threads 商品紹介プロンプト作成</h1>
+  <div class="sub">楽天の商品URLまたは商品タイトルを貼り、必要な文章だけを選んでプロンプトを作成します。</div>
+</header>
+
+<div class="card">
+  <div class="grid">
+
+    <div class="full">
+      <label for="item">商品URLまたは商品タイトル</label>
+      <textarea id="item" placeholder="楽天の商品URL、または商品タイトルを貼り付けてください。"></textarea>
+      <small>URLと商品タイトルのどちらか一方だけで使えます。</small>
+    </div>
+
+    <div>
+      <label for="outputMode">出力内容</label>
+      <select id="outputMode">
+        <option value="both">楽天ROOM紹介文＋Threads投稿</option>
+        <option value="room">楽天ROOM紹介文のみ</option>
+        <option value="threads">Threads投稿のみ</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="category">商品ジャンル</label>
+      <select id="category">
+        <option value="自動判定">自動判定</option>
+        <option value="家電">家電</option>
+        <option value="キッチン用品">キッチン用品</option>
+        <option value="日用品">日用品</option>
+        <option value="収納用品">収納用品</option>
+        <option value="子ども用品">子ども用品</option>
+        <option value="美容・UV対策">美容・UV対策</option>
+        <option value="食品・スイーツ">食品・スイーツ</option>
+        <option value="ファッション">ファッション</option>
+        <option value="ギフト">ギフト</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="used">使用状況</label>
+      <select id="used">
+        <option value="未使用">未使用</option>
+        <option value="使用済み">使用済み</option>
+        <option value="購入予定・気になっている">購入予定・気になっている</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="target">紹介したい相手</label>
+      <select id="target">
+        <option value="指定なし">指定なし</option>
+        <option value="AIに最適な対象を選ばせる">AIに最適な対象を選ばせる</option>
+        <option value="子育て家庭">子育て家庭</option>
+        <option value="共働き家庭">共働き家庭</option>
+        <option value="30代女性">30代女性</option>
+        <option value="40代女性">40代女性</option>
+        <option value="一人暮らし">一人暮らし</option>
+        <option value="新生活">新生活</option>
+        <option value="料理が好きな人">料理が好きな人</option>
+        <option value="収納に困っている人">収納に困っている人</option>
+        <option value="高齢者">高齢者</option>
+        <option value="学生">学生</option>
+        <option value="プレゼントを探している人">プレゼントを探している人</option>
+      </select>
+    </div>
+
+    <div class="full">
+      <label for="tone">Threadsの切り口</label>
+      <select id="tone">
+        <option value="AIに最適な切り口を選ばせる">自動選択</option>
+        <option value="家族の日常から自然につなげる">家族の日常</option>
+        <option value="日常の出来事から自然につなげる">日常</option>
+        <option value="家事の悩みから自然につなげる">家事</option>
+        <option value="育児の悩みから自然につなげる">育児</option>
+        <option value="仕事や忙しさから自然につなげる">仕事</option>
+        <option value="困りごと・あるあるからつなげる">困りごと・あるある</option>
+        <option value="季節の悩みからつなげる">季節</option>
+        <option value="料理の場面から自然につなげる">料理</option>
+        <option value="収納の悩みから自然につなげる">収納</option>
+        <option value="時短の視点から自然につなげる">時短</option>
+        <option value="商品の便利さを自然に伝える">便利さ</option>
+        <option value="お得情報を軽く伝える">お得情報</option>
+      </select>
+    </div>
+
+    <div class="full">
+      <label for="features">確実に分かっている特徴・紹介したい点</label>
+      <textarea id="features" placeholder="例：折りたたみ、キャスター付き、5面開き、大容量"></textarea>
+    </div>
+
+    <div class="full hidden" id="impressionWrap">
+      <label for="impressions">実際に使用した感想</label>
+      <textarea id="impressions" placeholder="実際に感じたことだけを入力してください。"></textarea>
+      <div class="section-label">使用済みを選んだ場合のみ表示されます。</div>
+    </div>
+
+    <div class="full">
+      <label for="sale">セール・クーポン情報</label>
+      <input id="sale" placeholder="例：63％OFFクーポンあり。内容は変更の可能性あり">
+    </div>
+
+    <div class="full">
+      <label for="message">紹介時に特に伝えたいこと</label>
+      <textarea id="message" placeholder="特になければ空欄で構いません。"></textarea>
+    </div>
+
+    <div class="full">
+      <label for="notes">備考</label>
+      <textarea id="notes" placeholder="例：強すぎる煽りは避ける。やわらかい雰囲気にする。"></textarea>
+    </div>
+
+  </div>
+
+  <div class="actions">
+    <button class="primary" type="button" id="buildBtn">プロンプトを作成</button>
+    <button class="secondary" type="button" id="copyBtn">プロンプトをコピー</button>
+    <button class="ghost" type="button" id="clearBtn">入力をクリア</button>
+  </div>
+
+  <div id="status" class="status" aria-live="polite"></div>
+</div>
+
+<div class="card">
+  <label for="output">完成プロンプト</label>
+  <textarea id="output" class="output" readonly placeholder="ここに完成した商品紹介用の指示文が表示されます"></textarea>
+
+  <div class="note">
+    選択した出力内容に応じて、楽天ROOM紹介文のみ、Threads投稿のみ、または両方を生成する指示文になります。
+    使用済み以外では、実際に使ったような体験談を作らないよう指示されます。
+  </div>
+</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const savedKeys = [
+  'outputMode',
+  'category',
+  'used',
+  'target',
+  'tone'
+];
+
+function saveSettings(){
+  savedKeys.forEach(id => {
+    localStorage.setItem('sayuProductPrompt_' + id, $(id).value);
+  });
+}
+
+function loadSettings(){
+  savedKeys.forEach(id => {
+    const saved = localStorage.getItem('sayuProductPrompt_' + id);
+    if(saved !== null){
+      $(id).value = saved;
+    }
+  });
+}
+
+function updateImpressionField(){
+  const isUsed = $('used').value === '使用済み';
+  $('impressionWrap').classList.toggle('hidden', !isUsed);
+
+  if(!isUsed){
+    $('impressions').value = '';
+  }
+}
+
+function buildProductPrompt(){
+  const item = $('item').value.trim();
+  const outputMode = $('outputMode').value;
+  const category = $('category').value;
+  const used = $('used').value;
+  const target = $('target').value;
+  const tone = $('tone').value;
+  const features = $('features').value.trim();
+  const impressions = $('impressions').value.trim();
+  const sale = $('sale').value.trim();
+  const message = $('message').value.trim();
+  const notes = $('notes').value.trim();
+
+  if(!item){
+    $('status').textContent = '商品URLまたは商品タイトルを入力してください。';
+    $('output').value = '';
+    return;
+  }
+
+  saveSettings();
+
+  let p = '【商品紹介モード】\n\n';
+  p += `商品URLまたは商品タイトル：\n${item}\n\n`;
+  p += `商品ジャンル：${category}\n`;
+  p += `使用状況：${used}\n`;
+  p += `紹介対象：${target}\n`;
+  p += `Threadsの切り口：${tone}\n`;
+
+  if(features){
+    p += `\n確認できている特徴：\n${features}\n`;
+  }
+
+  if(used === '使用済み' && impressions){
+    p += `\n使用した感想：\n${impressions}\n`;
+  }
+
+  if(sale){
+    p += `\nセール・クーポン情報：\n${sale}\n`;
+  }
+
+  if(message){
+    p += `\n紹介時に伝えたいこと：\n${message}\n`;
+  }
+
+  if(notes){
+    p += `\n備考：\n${notes}\n`;
+  }
+
+  p += '\nプロジェクト内の「01_プロジェクト設定」「02_商品紹介共通ルール」「03_ROOM紹介ルール」「04_Threads投稿ルール」「05_入力テンプレート」を必ず参照してください。\n\n';
+  p += '楽天商品タイトルに含まれる検索用・販促用の語句を整理し、商品の実質的な特徴を抽出してください。\n';
+  p += '「楽天1位」「ランキング」「○％OFF」「送料無料」「期間限定」「予約販売」などは、入力情報または商品ページで確認できた範囲を超えて断定しないでください。\n';
+  p += '商品情報にない性能、素材、サイズ、効果、価格、在庫、口コミ、使用感を推測で追加しないでください。\n';
+
+  if(used === '使用済み'){
+    p += '使用感は、入力された「使用した感想」の範囲内でのみ反映してください。入力されていない体験を追加しないでください。\n';
+  } else {
+    p += '使った・買った・家族が喜んだなど、実際に体験したような表現を作らないでください。\n';
+  }
+
+  p += '\n完成文のみを出力してください。\n\n';
+
+  if(outputMode === 'room'){
+    p += '【楽天ROOM紹介文】';
+  } else if(outputMode === 'threads'){
+    p += '【Threads投稿】';
+  } else {
+    p += '【楽天ROOM紹介文】\n\n【Threads投稿】';
+  }
+
+  $('output').value = p;
+  $('status').textContent = '商品紹介プロンプトを作成しました。';
+}
+
+async function copyPrompt(){
+  const text = $('output').value;
+
+  if(!text){
+    $('status').textContent = '先にプロンプトを作成してください。';
+    return;
+  }
+
+  try{
+    await navigator.clipboard.writeText(text);
+    $('status').textContent = 'プロンプトをコピーしました。';
+  }catch(e){
+    $('output').focus();
+    $('output').select();
+    document.execCommand('copy');
+    $('status').textContent = 'プロンプトをコピーしました。';
+  }
+}
+
+function clearForm(){
+  ['item','features','impressions','sale','message','notes','output'].forEach(id => {
+    $(id).value = '';
+  });
+
+  $('status').textContent = '';
+  updateImpressionField();
+}
+
+$('used').addEventListener('change', () => {
+  updateImpressionField();
+  saveSettings();
+});
+
+['outputMode','category','target','tone'].forEach(id => {
+  $(id).addEventListener('change', saveSettings);
+});
+
+$('buildBtn').addEventListener('click', buildProductPrompt);
+$('copyBtn').addEventListener('click', copyPrompt);
+$('clearBtn').addEventListener('click', clearForm);
+
+loadSettings();
+updateImpressionField();
+</script>
+</body>
+</html>

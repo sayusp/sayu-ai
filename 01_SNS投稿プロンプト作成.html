@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNS投稿プロンプト Ver2.3</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f4f4;
+    --card: #ffffff;
+    --border: #d7d7d7;
+    --text: #222222;
+    --sub: #666666;
+    --button: #222222;
+    --button-text: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px;
+    background: var(--card);
+    border-radius: 12px;
+  }
+
+  h1 {
+    margin: 0 0 20px;
+    font-size: 28px;
+  }
+
+  label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    background: #fff;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .row {
+    display: flex;
+    gap: 14px;
+  }
+
+  .row > div {
+    flex: 1;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--button);
+    color: var(--button-text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button.secondary {
+    background: #e8e8e8;
+    color: #222;
+  }
+
+  button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  #status {
+    min-height: 24px;
+    margin-top: 10px;
+    color: #1a7f37;
+    font-weight: 700;
+  }
+
+  #output {
+    min-height: 220px;
+    margin-top: 8px;
+    padding: 14px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafafa;
+  }
+
+  .help {
+    margin-top: 6px;
+    color: var(--sub);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 12px; }
+    .container { padding: 16px; }
+    .row { display: block; }
+    h1 { font-size: 23px; }
+    .buttons button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SNS投稿プロンプト Ver.2.3</h1>
+
+  <label for="character">キャラクター</label>
+  <select id="character">
+    <option value="ひかり">ひかり</option>
+    <option value="ゆきな">ゆきな</option>
+    <option value="さやか">さやか</option>
+    <option value="まゆみ">まゆみ</option>
+    <option value="ゆま">ゆま</option>
+    <option value="まゆ">まゆ</option>
+  </select>
+
+  <div class="row">
+    <div>
+      <label for="date">日付</label>
+      <input id="date" type="date">
+    </div>
+    <div>
+      <label for="postType">投稿</label>
+      <select id="postType">
+        <option value="朝昼夜（3投稿）">朝昼夜（3投稿）</option>
+        <option value="朝のみ">朝のみ</option>
+        <option value="昼のみ">昼のみ</option>
+        <option value="夜のみ">夜のみ</option>
+      </select>
+    </div>
+  </div>
+
+  <label for="media">媒体</label>
+  <select id="media">
+    <option value="X・Threads">X・Threads</option>
+    <option value="Xのみ">Xのみ</option>
+    <option value="Threadsのみ">Threadsのみ</option>
+  </select>
+
+  <label for="cta">夜投稿の誘導</label>
+  <select id="cta">
+    <option value="なし">なし</option>
+    <option value="LINE">LINE</option>
+    <option value="note">note</option>
+  </select>
+  <div class="help">朝昼夜を選んだ場合も、誘導は夜投稿だけに適用されます。</div>
+
+  <label for="themeMode">テーマの決め方</label>
+  <select id="themeMode">
+    <option value="資料から最適なテーマを選択">資料から最適なテーマを選択</option>
+    <option value="AIに任せる">AIに任せる</option>
+    <option value="指定する">指定する</option>
+  </select>
+
+  <label for="category">大まかなテーマ</label>
+  <select id="category">
+    <option value="指定なし">指定なし</option>
+    <option value="仕事">仕事</option>
+    <option value="子育て">子育て</option>
+    <option value="家事">家事</option>
+    <option value="夫婦">夫婦</option>
+    <option value="休日">休日</option>
+    <option value="趣味">趣味</option>
+    <option value="健康">健康</option>
+    <option value="季節">季節</option>
+    <option value="食べ物">食べ物</option>
+    <option value="買い物">買い物</option>
+    <option value="副業">副業</option>
+    <option value="人間関係">人間関係</option>
+    <option value="その他">その他</option>
+  </select>
+
+  <label for="themeDetail">テーマの詳細</label>
+  <textarea id="themeDetail" rows="2" placeholder="「指定する」を選んだ場合や、補足したい場合に入力"></textarea>
+
+  <label for="note">備考</label>
+  <textarea id="note" rows="4" placeholder="投稿に必ず反映したい内容を入力"></textarea>
+
+  <div class="buttons">
+    <button id="generateButton" type="button">プロンプト生成</button>
+    <button id="copyButton" type="button" class="secondary" disabled>コピー</button>
+  </div>
+
+  <div id="status" aria-live="polite"></div>
+
+  <label>出力（コピペ用）</label>
+  <div id="output"></div>
+</div>
+
+<script>
+  const character = document.getElementById("character");
+  const date = document.getElementById("date");
+  const postType = document.getElementById("postType");
+  const media = document.getElementById("media");
+  const cta = document.getElementById("cta");
+  const themeMode = document.getElementById("themeMode");
+  const category = document.getElementById("category");
+  const themeDetail = document.getElementById("themeDetail");
+  const note = document.getElementById("note");
+  const output = document.getElementById("output");
+  const status = document.getElementById("status");
+  const generateButton = document.getElementById("generateButton");
+  const copyButton = document.getElementById("copyButton");
+
+  function buildCtaInstruction() {
+    const post = postType.value;
+    const selectedCta = cta.value;
+
+    if (post === "朝昼夜（3投稿）") {
+      if (selectedCta === "LINE") {
+        return [
+          "・朝投稿と昼投稿には誘導文を入れないでください。",
+          "・夜投稿のみLINE誘導資料に従い、自然なLINE誘導を入れてください。"
+        ].join("\n");
+      }
+      if (selectedCta === "note") {
+        return [
+          "・朝投稿と昼投稿には誘導文を入れないでください。",
+          "・夜投稿のみ自然なnote誘導を入れてください。"
+        ].join("\n");
+      }
+      return "・朝・昼・夜のすべてを誘導なしで作成してください。";
+    }
+
+    if (post === "夜のみ") {
+      if (selectedCta === "LINE") {
+        return "・夜投稿にLINE誘導資料に従った自然なLINE誘導を入れてください。";
+      }
+      if (selectedCta === "note") {
+        return "・夜投稿に自然なnote誘導を入れてください。";
+      }
+      return "・誘導なしで作成してください。";
+    }
+
+    return "・朝投稿または昼投稿には誘導文を入れないでください。";
+  }
+
+  function buildThemeText() {
+    const mode = themeMode.value;
+    const detail = themeDetail.value.trim();
+
+    if (mode === "指定する") {
+      return detail || "未入力";
+    }
+
+    if (detail) {
+      return `${mode}（補足：${detail}）`;
+    }
+
+    return mode;
+  }
+
+  function generatePrompt() {
+    status.textContent = "";
+
+    if (!date.value) {
+      status.style.color = "#b42318";
+      status.textContent = "日付を選択してください。";
+      date.focus();
+      return;
+    }
+
+    const prompt = `【投稿作成】
+
+日付：${date.value}
+
+キャラクター：${character.value}
+
+投稿：${postType.value}
+
+媒体：${media.value}
+
+夜投稿の誘導：${cta.value}
+
+テーマ：${buildThemeText()}
+
+大まかなテーマ：${category.value}
+
+備考：
+${note.value.trim() || "なし"}
+
+共通資料およびキャラクター資料に従い、指定日の投稿を作成してください。
+
+${buildCtaInstruction()}
+
+・指定された時間帯の投稿だけを作成してください。
+・大まかなテーマが指定されている場合は、その範囲からキャラクターに合う題材を選んでください。
+・テーマが未指定の場合は、共通投稿素材集とキャラクター専用投稿素材から最適なテーマを選んでください。
+・Xは本文を全角140文字以内で作成してください。
+・Threadsは媒体特性に合わせて、自然で読みやすい文章量に調整してください。
+・XとThreadsは同じ文章を流用せず、それぞれに適した構成で作成してください。
+・朝・昼・夜ではテーマ、切り口、出来事、構成を変え、内容を重複させないでください。
+・備考がある場合は最優先で反映してください。
+・投稿文だけを、そのままコピペできる完成形で出力してください。`;
+
+    output.textContent = prompt;
+    copyButton.disabled = false;
+    status.style.color = "#1a7f37";
+    status.textContent = "プロンプトを生成しました。";
+  }
+
+  async function copyPrompt() {
+    const text = output.textContent.trim();
+
+    if (!text) {
+      status.style.color = "#b42318";
+      status.textContent = "先にプロンプトを生成してください。";
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      status.style.color = "#1a7f37";
+      status.textContent = "コピーしました。";
+    } catch (error) {
+      const range = document.createRange();
+      range.selectNodeContents(output);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.style.color = "#b54708";
+      status.textContent = "自動コピーできませんでした。出力欄を選択したので、Ctrl+Cでコピーしてください。";
+    }
+  }
+
+  generateButton.addEventListener("click", generatePrompt);
+  copyButton.addEventListener("click", copyPrompt);
+</script>
+</body>
+</html>
